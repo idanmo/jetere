@@ -1,0 +1,36 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+    <h2>Tests</h2>
+    {% if current_build.building %}
+        <p>Tests are not available for in progress builds.</p>
+    {% else %}
+        {% for suite_name, tests in suites.items %}
+            <br/>
+            <table class="table table-hover table-condensed">
+            <h4>Test suite: <mark><span class="tests-report-suite-name">{{ suite_name }}</span></mark></h4>
+            <tr class="table-header">
+                <td></td>
+                <td>Name</td>
+                <td>Duration</td>
+            </tr>
+            {% for test in tests %}
+                <tr onclick="window.location = '{% url 'logs' test.id %}';" class="tests-table-row {% if test.status == 'PASSED' or test.status == 'FIXED' %}success{% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}danger{% elif test.status == 'SKIPPED' %}warning{% endif %}">
+    {#            <tr class="{% if test.status == 'FAILED' or test.status == 'REGRESSION' %}danger{% elif test.status == 'SKIPPED' %}warning{% endif %}">#}
+                    {% if test.status == 'PASSED' or test.status == 'FIXED' %}
+                        <td><span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span></td>
+                    {% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}
+                        <td><span class="glyphicon glyphicon-remove" style="color: red" aria-hidden="true"></span></td>
+                    {% elif test.status == 'SKIPPED' %}
+                        <td><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    <td>{{ test.name }}</td>
+                    <td>{{ test.duration }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

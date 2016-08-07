@@ -1,0 +1,23 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+    <h2>Builds</h2>
+    <table class="table table-hover table-striped">
+        <tr class="table-header">
+            <td>#</td>
+            <td>Result</td>
+            <td>Time</td>
+            <td>Started By</td>
+            <td>Duration</td>
+        </tr>
+    {% for build in builds %}
+        <tr class="builds-table-row" onclick="window.location = '{% url 'tests' build.id %}';">
+            <td>{{ build.number }}</td>
+            <td>{% if build.result == 'SUCCESS' %}<span class="label label-success">PASSED</span>{% elif build.result == 'FAILURE' %}<span class="label label-danger">FAILED</span>{% elif build.result == 'ABORTED' %}<span class="label label-default">ABORTED</span>{% elif build.building %}<span class="label label-info">IN PROGRESS</span>{% endif %}</td>
+            <td>{{ build.timestamp }}</td>
+            <td>{{ build.started_by }}</td>
+            <td>{{ build.duration }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

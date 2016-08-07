@@ -1,0 +1,53 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+
+    <h3><mark class="{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">{{ current_test.name }}</mark></h3>
+    <ul>
+        <li>Status: {{ current_test.status }}</li>
+        <li>Class name: {{ current_test.class_name }}</li>
+        <li>Duration: {{ current_test.duration }}</li>
+        <li>Job: {{ current_job.name }}</li>
+        <li>Build number: {{ current_build.number }}</li>
+    </ul>
+
+    {% if test_logs.error_stack_trace %}
+    <div class="test-panel">
+        <div class="panel panel-{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">
+            <div class="panel-heading">
+                <h3 class="panel-title">Error Stack Trace</h3>
+            </div>
+            <div class="panel-body">
+                <samp>{{ test_logs.error_stack_trace | linebreaks }}</samp>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if test_logs.stdout %}
+    <div class="test-panel">
+        <div class="panel panel-{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">
+            <div class="panel-heading">
+                <h3 class="panel-title">STDOUT</h3>
+            </div>
+            <div class="panel-body">
+                <samp>{{ test_logs.stdout | linebreaks }}</samp>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if test_logs.stderr %}
+    <div class="test-panel">
+        <div class="panel panel-{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">
+            <div class="panel-heading">
+                <h3 class="panel-title">STDERR</h3>
+            </div>
+            <div class="panel-body">
+                <samp>{{ test_logs.stderr | linebreaks }}</samp>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
