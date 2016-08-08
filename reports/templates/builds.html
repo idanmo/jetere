@@ -4,11 +4,11 @@
     <h2>Builds</h2>
     <table class="table table-hover table-striped">
         <tr class="table-header">
-            <td>#</td>
-            <td>Result</td>
+            <td style="width: 5%;">#</td>
+            <td style="width: 10%;">Result</td>
             <td>Time</td>
             <td>Started By</td>
-            <td>Duration</td>
+            <td style="width: 10%;">Duration</td>
         </tr>
     {% for build in builds %}
         <tr class="builds-table-row" onclick="window.location = '{% url 'tests' build.id %}';">

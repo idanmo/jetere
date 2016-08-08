@@ -15,9 +15,6 @@ git clone git@github.com:idanmo/jetere.git
 
 # Create a superuser
 ./manage.py createsuperuser
-
-# Run the server
-./manage.py runserver
 ```
 
 ## Configuration
@@ -25,18 +22,20 @@ git clone git@github.com:idanmo/jetere.git
 * Point your browser to: http://localhost:8000/admin
 * Login using superuser.
 * Add a `Configuration` object with your jenkins server info.
+* Point your browser to: http://localhost:8000/admin
 * Create a `Job` object for each jenkins job you would like to generate test reports for.
 
 Job object example:
 * name: aaa
 * jenkins_path: dir_system-tests/system-tests
 
-## Sync with Jenkins
 
-In order to synchronize `jetere` with jenkins, run:
+# Run the server
 ```
-./manage.py sync
+./manage.py run --sync
 ```
+
+The `--sync` flag will automatically sync `jetere` with jenkins every 1 minute.
 
 Happily browse to http://localhost:8000 and view your test reports.
 

@@ -1,16 +1,13 @@
-
 import datetime
 import json
 import time
 
-from django.core.management.base import BaseCommand, CommandError
 from django.core import exceptions
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
-import jenkins
-
+from jetere import jenkins
 from reports import models
-
 
 # TODO: should be configurable in DB (maybe per job).
 BUILDS_HISTORY_LIMIT = 10

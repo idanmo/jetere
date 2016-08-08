@@ -5,32 +5,42 @@
     {% if current_build.building %}
         <p>Tests are not available for in progress builds.</p>
     {% else %}
-        {% for suite_name, tests in suites.items %}
-            <br/>
-            <table class="table table-hover table-condensed">
-            <h4>Test suite: <mark><span class="tests-report-suite-name">{{ suite_name }}</span></mark></h4>
-            <tr class="table-header">
-                <td></td>
-                <td>Name</td>
-                <td>Duration</td>
-            </tr>
-            {% for test in tests %}
-                <tr onclick="window.location = '{% url 'logs' test.id %}';" class="tests-table-row {% if test.status == 'PASSED' or test.status == 'FIXED' %}success{% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}danger{% elif test.status == 'SKIPPED' %}warning{% endif %}">
-    {#            <tr class="{% if test.status == 'FAILED' or test.status == 'REGRESSION' %}danger{% elif test.status == 'SKIPPED' %}warning{% endif %}">#}
-                    {% if test.status == 'PASSED' or test.status == 'FIXED' %}
-                        <td><span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span></td>
-                    {% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}
-                        <td><span class="glyphicon glyphicon-remove" style="color: red" aria-hidden="true"></span></td>
-                    {% elif test.status == 'SKIPPED' %}
-                        <td><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></td>
-                    {% else %}
+        <span>Show: </span>
+        <button type="button" class="btn btn-default" onclick="window.location = '{% url 'tests' current_build.id %}';">All</button>
+        <button type="button" class="btn btn-danger" onclick="window.location = '{% url 'failed_tests' current_build.id %}';">Only Failed</button>
+
+        <br/><br/>
+
+        {% for suite_name, suite_info in suites.items %}
+
+{#            <div class="panel panel-{% if suite_info.total == suite_info.passed %}success{% else %}danger{% endif %}">#}
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>{{ suite_name }} - {{ suite_info.passed }}/{{ suite_info.total }}</strong></div>
+                <table class="table table-hover table-striped">
+{#                    <tr class="table-header {% if suite_info.total == suite_info.passed %}success{% else %}danger{% endif %}">#}
+                    <tr class="table-header">
                         <td></td>
-                    {% endif %}
-                    <td>{{ test.name }}</td>
-                    <td>{{ test.duration }}</td>
-                </tr>
-            {% endfor %}
-            </table>
+                        <td>Name</td>
+                        <td style="width: 10%;">Duration</td>
+                    </tr>
+                    {% for test in suite_info.tests %}
+                        <tr onclick="window.location = '{% url 'logs' test.id %}';" class="tests-table-row {% if test.status == 'PASSED' or test.status == 'FIXED' %}success{% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}danger{% elif test.status == 'SKIPPED' %}warning{% endif %}">
+{#                        <tr onclick="window.location = '{% url 'logs' test.id %}';" class="tests-table-row">#}
+                            {% if test.status == 'PASSED' or test.status == 'FIXED' %}
+                                <td><span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span></td>
+                            {% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}
+                                <td><span class="glyphicon glyphicon-remove" style="color: red" aria-hidden="true"></span></td>
+                            {% elif test.status == 'SKIPPED' %}
+                                <td><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                            <td>{{ test.name }}</td>
+                            <td>{{ test.duration }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
         {% endfor %}
     {% endif %}
 {% endblock %}

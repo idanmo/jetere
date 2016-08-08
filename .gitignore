@@ -90,4 +90,5 @@ ENV/
 
 .idea
 *.iml
-
+db.sqlite3
+reports/migrations

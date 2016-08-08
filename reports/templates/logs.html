@@ -2,14 +2,26 @@
 
 {% block content %}
 
-    <h3><mark class="{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">{{ current_test.name }}</mark></h3>
-    <ul>
-        <li>Status: {{ current_test.status }}</li>
-        <li>Class name: {{ current_test.class_name }}</li>
-        <li>Duration: {{ current_test.duration }}</li>
-        <li>Job: {{ current_job.name }}</li>
-        <li>Build number: {{ current_build.number }}</li>
-    </ul>
+    <div class="panel panel-{% if current_test.passed %}success{% else %}danger{% endif %}">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><strong>{{ current_test.name }}</strong></div>
+        <table class="table table-hover table-striped">
+            <tr class="table-header {% if current_test.passed %}success{% else %}danger{% endif %}">
+                <td>Status</td>
+                <td>Class name</td>
+                <td>Job name</td>
+                <td>Build number</td>
+                <td style="width: 10%;">Duration</td>
+            </tr>
+            <tr>
+                <td>{{ current_test.status }}</td>
+                <td>{{ current_test.class_name }}</td>
+                <td>{{ current_job.name }}</td>
+                <td>{{ current_build.number }}</td>
+                <td>{{ current_test.duration }}</td>
+            </tr>
+        </table>
+    </div>
 
     {% if test_logs.error_stack_trace %}
     <div class="test-panel">

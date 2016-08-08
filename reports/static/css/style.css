@@ -33,9 +33,13 @@ body {
 }
 
 .table-header td {
-    background: #337ab7;
-    color: white;
+    /*background: #337ab7;*/
+    /*color: white;*/
     font-weight: bold;
+}
+
+.table-header td .success {
+    background: rgb(223, 240, 216);
 }
 
 .tests-report-suite-name {
@@ -43,7 +47,7 @@ body {
 }
 
 .test-panel {
-    padding-top: 30px;
+    /*padding-top: 10px;*/
 }
 
 mark.success {
