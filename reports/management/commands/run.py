@@ -30,7 +30,7 @@ class Command(BaseCommand):
                                stdin=stdin,
                                stdout=stdout,
                                stderr=stderr)
-        scheduler.enter(30, 1, self._sync, ())
+        # scheduler.enter(30, 1, self._sync, ())
 
     def handle(self, *args, **options):
         runserver_proc = Popen(self.runserver_cmd,

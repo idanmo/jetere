@@ -52,7 +52,7 @@ class Command(BaseCommand):
             conf_obj = conf_obj[0]
 
         conf_obj.jenkins_url = config['jenkins_url']
-        conf_obj.jenkins_username = config['jenkins_password']
+        conf_obj.jenkins_username = config['jenkins_username']
         conf_obj.jenkins_password = config['jenkins_password']
 
         conf_obj.save()

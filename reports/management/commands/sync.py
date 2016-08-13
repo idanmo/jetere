@@ -1,6 +1,7 @@
 import datetime
 import json
 import time
+import traceback
 
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
@@ -10,7 +11,7 @@ from jetere import jenkins
 from reports import models
 
 # TODO: should be configurable in DB (maybe per job).
-BUILDS_HISTORY_LIMIT = 10
+BUILDS_HISTORY_LIMIT = 20
 
 
 class Command(BaseCommand):
@@ -104,36 +105,38 @@ class Command(BaseCommand):
                     job.save()
                     self.stdout.write('Updated job.id=%d name to "%s"'
                                       % (job.id, display_name))
+
+                # update in progress builds
+                in_progress_builds = models.Build.objects.filter(job_id=job.id,
+                                                                 building=True)
+                self.stdout.write('Found in progress builds: %s'
+                                  % json.dumps(
+                        [x.number for x in in_progress_builds]))
+                if in_progress_builds:
+                    self.stdout.write('Processing in progress builds..')
+                    for build in in_progress_builds:
+                        self._process_build(
+                                build.number, errors, job, server, update=True)
+
+                builds_to_update = []
+                for build_number in jenkins_builds[:BUILDS_HISTORY_LIMIT]:
+                    try:
+                        models.Build.objects.get(job_id=job.id,
+                                                 number=build_number)
+                    except exceptions.ObjectDoesNotExist:
+                        builds_to_update.append(build_number)
+                self.stdout.write(
+                        'The following new builds will be synced from '
+                        'jenkins: %s' % json.dumps(builds_to_update))
+
+                for build_number in builds_to_update:
+                    self._process_build(build_number, errors, job, server)
+
             except Exception as e:
                 errors.append('Error processing job [%s]: %s - %s'
                               % (job, e.__class__.__name__, e.message))
                 self.stdout.write(self.style.ERROR(errors[-1]))
-
-            # update in progress builds
-            in_progress_builds = models.Build.objects.filter(job_id=job.id,
-                                                             building=True)
-            self.stdout.write('Found in progress builds: %s'
-                              % json.dumps(
-                                [x.number for x in in_progress_builds]))
-            if in_progress_builds:
-                self.stdout.write('Processing in progress builds..')
-                for build in in_progress_builds:
-                    self._process_build(
-                            build.number, errors, job, server, update=True)
-
-            builds_to_update = []
-            for build_number in jenkins_builds[:BUILDS_HISTORY_LIMIT]:
-                try:
-                    models.Build.objects.get(job_id=job.id,
-                                             number=build_number)
-                except exceptions.ObjectDoesNotExist:
-                    builds_to_update.append(build_number)
-            self.stdout.write(
-                    'The following new builds will be synced from jenkins: %s'
-                    % json.dumps(builds_to_update))
-
-            for build_number in builds_to_update:
-                self._process_build(build_number, errors, job, server)
+                self.stdout.write(self.style.ERROR(traceback.format_exc()))
 
         # TODO: store errors in DB.
         if errors:
@@ -191,3 +194,4 @@ class Command(BaseCommand):
                                  e.__class__.__name__,
                                  e.message))
             self.stdout.write(self.style.ERROR(errors[-1]))
+            self.stdout.write(self.style.ERROR(traceback.format_exc()))

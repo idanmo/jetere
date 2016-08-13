@@ -2,6 +2,8 @@
 import requests
 
 
+# TODO: handle 404
+
 class Jenkins(object):
 
     def __init__(self, base_url, username=None, password=None):
@@ -16,6 +18,10 @@ class Jenkins(object):
                 '' if tree is None else tree)
         response = requests.get(resource,
                                 auth=(self._username, self._password))
+        if response.status_code != 200:
+            raise IOError('Request for resource: "%s" status code = %d'
+                          % (resource, response.status_code))
+
         return response.json()
 
     def get_build(self, job_name, build_number, tree=None):
@@ -26,6 +32,10 @@ class Jenkins(object):
                 '' if tree is None else 'tree=%s' % tree)
         response = requests.get(resource,
                                 auth=(self._username, self._password))
+        if response.status_code != 200:
+            raise IOError('Request for resource: "%s" status code = %d'
+                          % (resource, response.status_code))
+
         return response.json()
 
     def get_tests_report(self, job_name, build_number):
