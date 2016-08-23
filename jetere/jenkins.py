@@ -14,7 +14,7 @@ class Jenkins(object):
     def get_job(self, job_name, tree=None):
         resource = '{}/job/{}/api/json?tree={}'.format(
                 self._base_url,
-                job_name.replace('/', '/job/'),
+                self._remove_slash_at_end(job_name).replace('/', '/job/'),
                 '' if tree is None else tree)
         response = requests.get(resource,
                                 auth=(self._username, self._password))
@@ -27,7 +27,7 @@ class Jenkins(object):
     def get_build(self, job_name, build_number, tree=None):
         resource = '{}/job/{}/{}/api/json?{}'.format(
                 self._base_url,
-                job_name.replace('/', '/job/'),
+                self._remove_slash_at_end(job_name).replace('/', '/job/'),
                 build_number,
                 '' if tree is None else 'tree=%s' % tree)
         response = requests.get(resource,
@@ -41,7 +41,7 @@ class Jenkins(object):
     def get_tests_report(self, job_name, build_number):
         resource = '{}/job/{}/{}/testReport/api/json'.format(
                 self._base_url,
-                job_name.replace('/', '/job/'),
+                self._remove_slash_at_end(job_name).replace('/', '/job/'),
                 build_number)
         response = requests.get(resource,
                                 auth=(self._username, self._password))
@@ -49,3 +49,6 @@ class Jenkins(object):
             raise IOError('Request for resource: "%s" status code = %d'
                           % (resource, response.status_code))
         return response.json()
+
+    def _remove_slash_at_end(self, job_name):
+        return job_name[:-1] if job_name.endswith('/') else job_name

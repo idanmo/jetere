@@ -150,7 +150,7 @@ class Command(BaseCommand):
                 'Sync done in %s seconds.' % (time.time() - start_time)))
 
     def _process_build(self, build_number, errors, job, server, update=False):
-        self.stdout.write('Processing build #%d..' % build_number)
+        self.stdout.write('\nProcessing build #%d..' % build_number)
         try:
             # TODO: add tree=... to get_build invocation
             jenkins_build = server.get_build(job.jenkins_path,
@@ -160,8 +160,9 @@ class Command(BaseCommand):
                                                  number=build_number)
             else:
                 build = models.Build()
-            build.duration = datetime.timedelta(
+            duration = datetime.timedelta(
                     milliseconds=jenkins_build['duration'])
+            build.duration = duration - datetime.timedelta(microseconds=duration.microseconds)
             build.number = build_number
             build.result = jenkins_build['result']
 
@@ -177,9 +178,15 @@ class Command(BaseCommand):
 
             build = models.Build.objects.get(job_id=job.id,
                                              number=build.number)
+            self.stdout.write('Build result: ' + str(build.result))
+
             if build.building:
                 self.stdout.write(' - Build in "building" state, '
                                   'not processing tests.')
+
+            elif build.result == 'ABORTED':
+                self.stdout.write(' - Build in "aborted" state, not processing tests.')
+
             else:
                 report = server.get_tests_report(job.jenkins_path,
                                                  build.number)

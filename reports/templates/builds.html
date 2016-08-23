@@ -6,7 +6,7 @@
         <tr class="table-header">
             <td style="width: 5%;">#</td>
             <td style="width: 10%;">Result</td>
-            <td>Time</td>
+            <td>Started Time</td>
             <td>Started By</td>
             <td style="width: 10%;">Duration</td>
         </tr>
@@ -14,7 +14,7 @@
         <tr class="builds-table-row" onclick="window.location = '{% url 'tests' build.id %}';">
             <td>{{ build.number }}</td>
             <td>{% if build.result == 'SUCCESS' %}<span class="label label-success">PASSED</span>{% elif build.result == 'FAILURE' %}<span class="label label-danger">FAILED</span>{% elif build.result == 'ABORTED' %}<span class="label label-default">ABORTED</span>{% elif build.building %}<span class="label label-info">IN PROGRESS</span>{% endif %}</td>
-            <td>{{ build.timestamp }}</td>
+            <td>{{ build.timestamp |date:'l, d-m-Y , H:i'}}</td>
             <td>{{ build.started_by }}</td>
             <td>{{ build.duration }}</td>
         </tr>
