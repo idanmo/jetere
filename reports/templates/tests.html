@@ -7,12 +7,20 @@
     {% else %}
         <span>Show: </span>
         <button type="button" class="btn btn-default" onclick="window.location = '{% url 'tests' current_build.id %}';">All</button>
-        <button type="button" class="btn btn-danger" onclick="window.location = '{% url 'failed_tests' current_build.id %}';">Only Failed</button>
+        <button type="button" class="btn btn-danger" onclick="window.location = '{% url 'failed_tests' current_build.id %}';">Failed & Skipped</button>
 
         <br/><br/>
 
-        {% for suite_name, suite_info in suites.items %}
+        <div class="panel panel-default">
+         <div class="panel-heading"><h4><strong>Tests summary</strong></h4></div>
+            <table class="table table-hover table-striped">
+                <td width="10%"><span class="glyphicon glyphicon-cloud" style="color: #2aabd2"></span><strong> Total: {{ tests_summary.total}}</strong></td>
+                <td width="14%"><span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span><strong> Passed: {{ tests_summary.passed}}&emsp;<span class="glyphicon glyphicon-scale" style="color: green"></span> {% widthratio tests_summary.passed tests_summary.total 100 %}%</strong></td>
+                <td><span class="glyphicon glyphicon-remove" style="color: red" aria-hidden="true"></span><strong> Failed & Skipped: {{ tests_summary.failed}}&emsp;<span class="glyphicon glyphicon-scale" style="color: red"></span> {% widthratio tests_summary.failed tests_summary.total 100 %}%</strong></td>
+            </table>
+            </div>
 
+        {% for suite_name, suite_info in suites.items %}
 {#            <div class="panel panel-{% if suite_info.total == suite_info.passed %}success{% else %}danger{% endif %}">#}
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>{{ suite_name }} - {{ suite_info.passed }}/{{ suite_info.total }}</strong></div>
