@@ -9,6 +9,21 @@ CONFIG_DIR_PATH = os.path.expanduser('~/.jetere')
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'config.json')
 
 
+def load_jenkins_configuration_from_file():
+    if os.path.exists(CONFIG_FILE_PATH):
+        with open(CONFIG_FILE_PATH, 'r') as f:
+            return json.load(f)
+
+
+def update_jenkins_configuration_in_db(config,
+                                       config_model=models.Configuration()):
+    config_model.jenkins_url = config['jenkins_url']
+    config_model.jenkins_username = config['jenkins_username']
+    config_model.jenkins_password = config['jenkins_password']
+    config_model.save()
+    return config_model
+
+
 class Command(BaseCommand):
     help = 'Configure jetere'
 
@@ -45,15 +60,10 @@ class Command(BaseCommand):
         conf_obj = models.Configuration.objects.all()
         if len(conf_obj) == 0:
             self.stdout.write('Creating a new configuration in DB...')
-            conf_obj = models.Configuration()
+            update_jenkins_configuration_in_db(config)
         else:
             self.stdout.write(
                 'Existing configuration found in DB, updating...')
-            conf_obj = conf_obj[0]
+            update_jenkins_configuration_in_db(config, conf_obj[0])
 
-        conf_obj.jenkins_url = config['jenkins_url']
-        conf_obj.jenkins_username = config['jenkins_username']
-        conf_obj.jenkins_password = config['jenkins_password']
-
-        conf_obj.save()
         self.stdout.write(self.style.SUCCESS('Done.'))

@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from jetere import jenkins
 from reports import models
+from . import configure
 
 # TODO: should be configurable in DB (maybe per job).
 BUILDS_HISTORY_LIMIT = 20
@@ -16,6 +17,16 @@ BUILDS_HISTORY_LIMIT = 20
 
 class Command(BaseCommand):
     help = 'Sync database with Jenkins'
+
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+        parser.add_argument('--every',
+                            type=int,
+                            help='Sync periodically every X seconds.')
+        parser.add_argument('--max-builds',
+                            type=int,
+                            default=BUILDS_HISTORY_LIMIT,
+                            help='Maximum number of builds to retrieve.')
 
     @staticmethod
     def _extract_started_by(jenkins_build):
@@ -61,31 +72,46 @@ class Command(BaseCommand):
     def _get_jenkins_configuration():
         configuration = models.Configuration.objects.all()
         if len(configuration) == 0:
-            raise CommandError('Jenkins configuration not found in DB.')
+            from_file = configure.load_jenkins_configuration_from_file()
+            if not from_file:
+                raise CommandError('Jenkins configuration not found in DB.')
+            else:
+                return configure.update_jenkins_configuration_in_db(from_file)
         if len(configuration) > 1:
             raise CommandError('There is more than one Jenkins configuration '
                                'in DB. remove unused configurations.')
         return configuration[0]
 
     def handle(self, *args, **options):
-        start_time = time.time()
+        every = options.get('every', None)
+        max_builds = options['max_builds']
+        if every:
+            while True:
+                self.do_sync(max_builds)
+                self.stdout.write('-----')
+                self.stdout.write(
+                        'Next sync will occur in %d seconds.' % every)
+                self.stdout.write('')
+                time.sleep(every)
+        else:
+            self.do_sync(max_builds)
 
+    def do_sync(self, max_builds):
+        start_time = time.time()
+        self.stdout.write('*********')
+        self.stdout.write('* Syncing from Jenkins...')
+        self.stdout.write('')
         config = self._get_jenkins_configuration()
         self.stdout.write(
                 self.style.SUCCESS('Jenkins configuration found in DB.'))
-
         self.stdout.write('Jenkins URL: %s' % config.jenkins_url)
         self.stdout.write('Jenkins username: %s, password: *****'
                           % config.jenkins_username)
-
         # TODO: rest call for verifying jenkins connectivity
         self.stdout.write(self.style.SUCCESS(
                 'Connection to Jenkins server established.'))
-
         jobs = models.Job.objects.all()
-
         errors = []
-
         self.stdout.write('The following jobs will be processed:')
         for job in jobs:
             self.stdout.write(' - %s' % job)
@@ -119,7 +145,7 @@ class Command(BaseCommand):
                                 build.number, errors, job, server, update=True)
 
                 builds_to_update = []
-                for build_number in jenkins_builds[:BUILDS_HISTORY_LIMIT]:
+                for build_number in jenkins_builds[:max_builds]:
                     try:
                         models.Build.objects.get(job_id=job.id,
                                                  number=build_number)
@@ -144,7 +170,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR('Errors summary:'))
             for error in errors:
                 self.stdout.write('- %s' % error)
-
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS(
                 'Sync done in %s seconds.' % (time.time() - start_time)))
