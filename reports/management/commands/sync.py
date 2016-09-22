@@ -63,7 +63,8 @@ class Command(BaseCommand):
                     test_id=test.id,
                     error_stack_trace=case['errorStackTrace'],
                     stdout=case['stdout'],
-                    stderr=case['stderr']
+                    stderr=case['stderr'],
+                    error_details=case['errorDetails']
                 ).save()
 
         return tests_count

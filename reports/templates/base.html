@@ -23,14 +23,14 @@
 <body>
     <div class="page-header">
         <h1><a href="{% url 'index' %}">Cloudify Tests</a></h1>
-        <span class="label label-info">Last Update: {{ last_update|time:'G:i' }} UTC</span>
+        <span class="label label-info">Last Update: {{ last_update|time:'G:i' }}</span>
     </div>
 
     <div class="col-sm-2 left-menu">
         <h2>Jobs</h2>
         <ul class="nav nav-pills nav-stacked">
             {% for job in jobs %}
-                <li><a href="{% url 'builds' job.id %}" class="list-group-item {% if current_job.id == job.id %}active{% endif %}">{{ job.name }}</a></li>
+                <li><a href="{% url 'timer_builds' job.id %}" class="list-group-item {% if current_job.id == job.id %}active{% endif %}">{{ job.name }}</a></li>
             {% endfor %}
         </ul>
     </div>

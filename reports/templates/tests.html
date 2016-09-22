@@ -7,8 +7,8 @@
     {% else %}
         <span>Show: </span>
         <button type="button" class="btn btn-default" onclick="window.location = '{% url 'tests' current_build.id %}';">All</button>
-        <button type="button" class="btn btn-danger" onclick="window.location = '{% url 'failed_tests' current_build.id %}';">Failed & Skipped</button>
-
+        <button type="button" class="btn btn-danger" onclick="window.location = '{% url 'failed&skipped_tests' current_build.id %}';">Failed & Skipped</button>
+        <span class="filter">Filter: {{filter}}</span>
         <br/><br/>
 
         <div class="panel panel-default">
@@ -35,11 +35,11 @@
                         <tr onclick="window.location = '{% url 'logs' test.id %}';" class="tests-table-row {% if test.status == 'PASSED' or test.status == 'FIXED' %}success{% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}danger{% elif test.status == 'SKIPPED' %}warning{% endif %}">
 {#                        <tr onclick="window.location = '{% url 'logs' test.id %}';" class="tests-table-row">#}
                             {% if test.status == 'PASSED' or test.status == 'FIXED' %}
-                                <td><span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span></td>
+                                <td width="5%"><span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span></td>
                             {% elif test.status == 'FAILED' or test.status == 'REGRESSION' %}
-                                <td><span class="glyphicon glyphicon-remove" style="color: red" aria-hidden="true"></span></td>
+                                <td width="5%"><span class="glyphicon glyphicon-remove" style="color: red" aria-hidden="true"></span></td>
                             {% elif test.status == 'SKIPPED' %}
-                                <td><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></td>
+                                <td width="5%"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></td>
                             {% else %}
                                 <td></td>
                             {% endif %}
