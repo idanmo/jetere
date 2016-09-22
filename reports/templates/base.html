@@ -23,6 +23,7 @@
 <body>
     <div class="page-header">
         <h1><a href="{% url 'index' %}">Cloudify Tests</a></h1>
+        <span class="label label-info">Last Update: {{ last_update|time:'G:i' }} UTC</span>
     </div>
 
     <div class="col-sm-2 left-menu">

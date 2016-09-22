@@ -163,6 +163,14 @@ class Command(BaseCommand):
                               % (job, e.__class__.__name__, e.message))
                 self.stdout.write(self.style.ERROR(errors[-1]))
                 self.stdout.write(self.style.ERROR(traceback.format_exc()))
+            sync_data = models.Sync.objects.all()
+            if sync_data:
+                sync_data = sync_data[0]
+            else:
+                sync_data = models.Sync()
+            sync_data.last_update = timezone.make_aware(
+                    datetime.datetime.now())
+            sync_data.save()
 
         # TODO: store errors in DB.
         if errors:

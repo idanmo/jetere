@@ -11,6 +11,11 @@ class Configuration(models.Model):
     jenkins_password = models.CharField(max_length=32)
 
 
+class Sync(models.Model):
+    id = models.AutoField(primary_key=True)
+    last_update = models.DateTimeField()
+
+
 class Job(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
