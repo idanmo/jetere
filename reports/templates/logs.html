@@ -23,6 +23,19 @@
         </table>
     </div>
 
+    {% if test_logs.error_details %}
+    <div class="test-panel">
+        <div class="panel panel-{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">
+            <div class="panel-heading">
+                <h3 class="panel-title">Error Details</h3>
+            </div>
+            <div class="panel-body">
+                <samp>{{ test_logs.error_details | linebreaks }}</samp>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% if test_logs.error_stack_trace %}
     <div class="test-panel">
         <div class="panel panel-{% if current_test.passed %}success{% elif current_test.failed %}danger{% else %}warning{% endif %}">

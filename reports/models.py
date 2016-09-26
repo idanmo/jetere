@@ -65,3 +65,4 @@ class TestLogs(models.Model):
     error_stack_trace = models.TextField(null=True)
     stdout = models.TextField(null=True)
     stderr = models.TextField(null=True)
+    error_details = models.TextField(null=True)

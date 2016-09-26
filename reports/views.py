@@ -39,18 +39,23 @@ def index(request):
 
 
 @render_me('builds.html')
-def builds(request, job_id):
+def builds(request, job_id, timer=False, filter='All'):
     job = models.Job.objects.all().get(id=job_id)
-    builds = models.Build.objects.all().filter(
+    if timer:
+        builds = models.Build.objects.all().filter(
+            job_id=job_id, started_by='Timer').order_by('-number')
+    else:
+        builds = models.Build.objects.all().filter(
             job_id=job_id).order_by('-number')
     return {
         'current_job': job,
-        'builds': builds
+        'builds': builds,
+        'filter': filter
     }
 
 
 @render_me('tests.html')
-def tests(request, build_id, failed=False):
+def tests(request, build_id, failed=False, filter='All'):
     build = models.Build.objects.get(id=build_id)
     build_tests = models.Test.objects.all().filter(build_id=build_id)
     suites = {}
@@ -83,12 +88,17 @@ def tests(request, build_id, failed=False):
         'current_job': build.job,
         'current_build': build,
         'suites': suites,
-        'tests_summary': tests_summary
+        'tests_summary': tests_summary,
+        'filter': filter
     }
 
 
 def failed_tests(request, build_id):
-    return tests(request, build_id, failed=True)
+    return tests(request, build_id, failed=True, filter='Failed & Skipped')
+
+
+def timer_builds(request, job_id):
+    return builds(request, job_id, timer=True, filter='Timer')
 
 
 @render_me(html_file='logs.html')
